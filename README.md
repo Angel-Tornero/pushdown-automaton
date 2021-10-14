@@ -1,1 +1,1 @@
-# stack-automaton
+# Stack-automaton
