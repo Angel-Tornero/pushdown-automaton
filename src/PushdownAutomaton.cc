@@ -5,6 +5,7 @@
 #include <map>
 #include <vector>
 #include <utility>
+#include <iterator>
 
 PushdownAutomaton::PushdownAutomaton(std::string& file_name) {
   parse(file_name);
@@ -15,7 +16,7 @@ std::set<std::string> tokenizer(std::string& s) {
     std::string word;
     std::set<std::string> set;
     while (ss >> word) {
-        array.push_back(word);
+        set.insert(word);
     }
     return set;
 }
@@ -34,9 +35,9 @@ void PushdownAutomaton::parse(std::string& file_name) {
   //Conjunto Q
   std::set<std::string> states = tokenizer(temp_string);
   std::map<std::string, State*> state_map;
-  for (unsigned i = 0; i < tokens.size(); i++) {
-    State* new_state = new State(tokens[i]);
-    state_map[tokens[i]] = new_state;
+  for (auto element: states) {
+    State* new_state = new State(element);
+    state_map[element] = new_state;
     Q_.insert(new_state);
   }
 
@@ -56,14 +57,14 @@ void PushdownAutomaton::parse(std::string& file_name) {
 
   //Simbolo inicial de la pila
   std::getline(in_file, temp_string);
-  stack_ = new Stack(temp_file);
+  stack_ = new Stack(temp_string);
 
   //Conjunto F
   std::getline(in_file, temp_string);
-  tokens = tokenizer(temp_string);
-  for (unsigned i = 0; i < tokens.size(); i++) {
-    stack_alphabet.insert(tokens[i]);
+  std::set<std::string> tokens = tokenizer(temp_string);
+  std::set<State*> final_states;
+  for (auto element: tokens) {
+    final_states.insert(state_map[element]);
   }
-
-
+  F_ = final_states;
 }

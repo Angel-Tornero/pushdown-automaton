@@ -8,7 +8,7 @@ class PushdownAutomaton {
   private:
     Alphabet* tape_alphabet_;
     Alphabet* stack_alphabet_;
-    Stack* stack;
+    Stack* stack_;
     TransitionFunction* transition_function_;
     std::set<State*> Q_;
     State* initial_state_;
