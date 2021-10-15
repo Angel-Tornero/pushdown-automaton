@@ -6,6 +6,10 @@
 #include <vector>
 #include <utility>
 #include <iterator>
+#include <tuple>
+
+const int TAPE = 1;
+const int STACK = 2;
 
 PushdownAutomaton::PushdownAutomaton(std::string& file_name) {
   parse(file_name);
@@ -21,12 +25,17 @@ std::set<std::string> tokenizer(std::string& s) {
     return set;
 }
 
-void PushdownAutomaton::parse(std::string& file_name) {
+std::ifstream openInputFile(std::string& file_name) {
   std::ifstream in_file(file_name);
   if (in_file.fail()) {
     std::cout << "No existe el archivo.\n";
     throw -1;
   }
+  return in_file;
+}
+
+void PushdownAutomaton::parse(std::string& file_name) {
+  std::ifstream in_file = openInputFile(file_name);
   std::string temp_string;
   do {
     std::getline(in_file, temp_string);
@@ -42,14 +51,10 @@ void PushdownAutomaton::parse(std::string& file_name) {
   }
 
   //Alfabeto de cinta
-  std::getline(in_file, temp_string);
-  std::set<std::string> tape_alphabet = tokenizer(temp_string);
-  tape_alphabet_ = new Alphabet(tape_alphabet);
+  parseAlphabet(in_file, TAPE);
 
   //Alfabeto de pila
-  std::getline(in_file, temp_string);
-  std::set<std::string> stack_alphabet = tokenizer(temp_string);;
-  stack_alphabet_ = new Alphabet(stack_alphabet);
+  parseAlphabet(in_file, STACK);
 
   //Estado inicial
   std::getline(in_file, temp_string);
@@ -67,4 +72,41 @@ void PushdownAutomaton::parse(std::string& file_name) {
     final_states.insert(state_map[element]);
   }
   F_ = final_states;
+
+  //Funcion de transición
+  parseTransitionFunction(in_file, state_map);
+}
+
+void PushdownAutomaton::parseAlphabet(std::ifstream& file, int option) {
+  std::string temp;
+  std::getline(file, temp);
+  std::set<std::string> alphabet = tokenizer(temp);
+  switch (option) {
+    case TAPE:
+      tape_alphabet_ = new Alphabet(alphabet);
+      break;
+    case STACK:
+      stack_alphabet_ = new Alphabet(alphabet);
+      break;
+  }
+}
+
+void PushdownAutomaton::parseTransitionFunction(std::ifstream& file, std::map<std::string, State*>& state_map) {
+  std::string temp;
+  std::string start_state;
+  std::string tape_symbol;
+  std::string pop;
+  std::string finish_state;
+  std::string push;
+  std::vector<std::string> push_vector;
+  while (std::getline(file, temp)) {
+    std::istringstream iss;
+    iss >> start_state;
+    iss >> tape_symbol;
+    iss >> pop;
+    iss >> finish_state;
+    while (iss >> push) {
+      push_vector.push_back(push);
+    }
+  }
 }
