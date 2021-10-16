@@ -1,7 +1,7 @@
 #include "Alphabet.h"
 #include "Stack.h"
 #include "State.h"
-#include "TransitionFunction.h"
+#include "Transition.h"
 #include <set>
 #include <map>
 
@@ -10,7 +10,6 @@ class PushdownAutomaton {
     Alphabet* tape_alphabet_;
     Alphabet* stack_alphabet_;
     Stack* stack_;
-    TransitionFunction* transition_function_;
     std::set<State*> Q_;
     State* initial_state_;
     std::set<State*> F_;
@@ -20,5 +19,6 @@ class PushdownAutomaton {
 
   public:
     PushdownAutomaton(std::string& file_name);
+    ~PushdownAutomaton();
     void parse(std::string& file_name);
 };

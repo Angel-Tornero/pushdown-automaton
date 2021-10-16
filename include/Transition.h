@@ -1,15 +1,15 @@
 #include "State.h"
 
 /**
- * @class TransitionFunction
+ * @class Transition
  * 
  */
-class TransitionFunction {
+class Transition {
   private:
     State* start_;
     State* finish_;
     char tape_symbol_;
     char stack_symbol_;
   public:
-    TransitionFunction();
+    Transition(State* start, State* finish, char tape_symbol, char stack_symbol);
 };

@@ -6,13 +6,19 @@
 #include <vector>
 #include <utility>
 #include <iterator>
-#include <tuple>
 
 const int TAPE = 1;
 const int STACK = 2;
 
 PushdownAutomaton::PushdownAutomaton(std::string& file_name) {
   parse(file_name);
+}
+
+PushdownAutomaton::~PushdownAutomaton() {
+  delete tape_alphabet_;
+  delete stack_alphabet_;
+  delete stack_;
+  for (auto element: Q_) delete element;
 }
 
 std::set<std::string> tokenizer(std::string& s) {
@@ -92,15 +98,10 @@ void PushdownAutomaton::parseAlphabet(std::ifstream& file, int option) {
 }
 
 void PushdownAutomaton::parseTransitionFunction(std::ifstream& file, std::map<std::string, State*>& state_map) {
-  std::string temp;
-  std::string start_state;
-  std::string tape_symbol;
-  std::string pop;
-  std::string finish_state;
-  std::string push;
+  std::string temp, start_state, tape_symbol, pop, finish_state, push;
   std::vector<std::string> push_vector;
   while (std::getline(file, temp)) {
-    std::istringstream iss;
+    std::istringstream iss(temp);
     iss >> start_state;
     iss >> tape_symbol;
     iss >> pop;
@@ -108,5 +109,6 @@ void PushdownAutomaton::parseTransitionFunction(std::ifstream& file, std::map<st
     while (iss >> push) {
       push_vector.push_back(push);
     }
+    state_map[start_state]->addTransition(std::make_pair(tape_symbol, pop), std::make_pair(state_map[finish_state], push_vector));
   }
 }
