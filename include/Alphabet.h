@@ -7,15 +7,18 @@
  */
 class Alphabet {
   private:
-    std::set<std::string> symbols_;
+    friend class PushdownAutomaton;
+    std::set<char> symbols_;
   
   public:
-    Alphabet(std::set<std::string> symbols);
+    Alphabet(std::set<char> symbols);
     /**
      * @brief Check if the alphabet contains the given character
      * @param c char
      * @returns bool
      * 
      */
-    bool contain(std::string c);
+    bool contain(char c);
+
+    std::ostream& operator<<(std::ostream&);
 };

@@ -7,25 +7,34 @@
  */
 class Stack {
   private:
-    std::vector<std::string> stack_;
+    std::vector<char> stack_;
 
   public:
-    Stack(std::string initial_symbol);
+    Stack(char initial_symbol);
     /**
      * @brief Get the top symbol of the stack
      * @return char
      * 
      */
-    std::string top();
+    char top();
     /**
      * @brief Push a symbol to the stack
      * @param c char
      * 
      */
-    void push(std::string c);
+    void push(char c);
     /**
      * @brief Remove top element
      * 
      */
     void pop();
+    /**
+     * @brief Checks if the stack is empty
+     * 
+     * @return true 
+     * @return false 
+     */
+    bool empty();
+
+    std::ostream& operator<<(std::ostream& os);
 };

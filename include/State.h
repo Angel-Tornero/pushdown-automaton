@@ -15,11 +15,13 @@ class State {
   private:
     friend class PushdownAutomaton;
     std::string id_;
-    std::map<std::pair<std::string, std::string>, std::set<std::pair<State*,std::vector<std::string>>>> transition_function_;
+    std::map<std::pair<char, char>, std::set<std::pair<State*,std::vector<char>>>> transition_function_;
+    
+    std::set<std::pair<State*,std::vector<char>>> getNext(char tape_symbol, char stack_symbol);
   
   public:
     State(std::string id);
-    void addTransition(std::pair<std::string, std::string>, std::pair<State*,std::vector<std::string>>);
+    void addTransition(std::pair<char, char>, std::pair<State*,std::vector<char>>);
 };
 
 

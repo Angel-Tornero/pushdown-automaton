@@ -4,6 +4,6 @@ State::State(std::string id) {
   id_ = id;
 }
 
-void State::addTransition(std::pair<std::string, std::string> symbols, std::pair<State*,std::vector<std::string>> destiny) {
+void State::addTransition(std::pair<char, char> symbols, std::pair<State*,std::vector<char>> destiny) {
   transition_function_[symbols].insert(destiny);
 }

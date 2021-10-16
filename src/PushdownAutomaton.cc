@@ -21,7 +21,7 @@ PushdownAutomaton::~PushdownAutomaton() {
   for (auto element: Q_) delete element;
 }
 
-std::set<std::string> tokenizer(std::string& s) {
+std::set<std::string> tokenizerToString(std::string& s) {
     std::stringstream ss(s);
     std::string word;
     std::set<std::string> set;
@@ -30,6 +30,17 @@ std::set<std::string> tokenizer(std::string& s) {
     }
     return set;
 }
+
+std::set<char> tokenizerToChar(std::string& s) {
+    std::stringstream ss(s);
+    char word;
+    std::set<char> set;
+    while (ss >> word) {
+        set.insert(word);
+    }
+    return set;
+}
+
 
 std::ifstream openInputFile(std::string& file_name) {
   std::ifstream in_file(file_name);
@@ -48,7 +59,7 @@ void PushdownAutomaton::parse(std::string& file_name) {
   } while (temp_string[0] == '#');
 
   //Conjunto Q
-  std::set<std::string> states = tokenizer(temp_string);
+  std::set<std::string> states = tokenizerToString(temp_string);
   std::map<std::string, State*> state_map;
   for (auto element: states) {
     State* new_state = new State(element);
@@ -68,16 +79,7 @@ void PushdownAutomaton::parse(std::string& file_name) {
 
   //Simbolo inicial de la pila
   std::getline(in_file, temp_string);
-  stack_ = new Stack(temp_string);
-
-  //Conjunto F
-  std::getline(in_file, temp_string);
-  std::set<std::string> tokens = tokenizer(temp_string);
-  std::set<State*> final_states;
-  for (auto element: tokens) {
-    final_states.insert(state_map[element]);
-  }
-  F_ = final_states;
+  stack_ = new Stack(temp_string[0]);
 
   //Funcion de transición
   parseTransitionFunction(in_file, state_map);
@@ -86,7 +88,7 @@ void PushdownAutomaton::parse(std::string& file_name) {
 void PushdownAutomaton::parseAlphabet(std::ifstream& file, int option) {
   std::string temp;
   std::getline(file, temp);
-  std::set<std::string> alphabet = tokenizer(temp);
+  std::set<char> alphabet = tokenizerToChar(temp);
   switch (option) {
     case TAPE:
       tape_alphabet_ = new Alphabet(alphabet);
@@ -98,17 +100,73 @@ void PushdownAutomaton::parseAlphabet(std::ifstream& file, int option) {
 }
 
 void PushdownAutomaton::parseTransitionFunction(std::ifstream& file, std::map<std::string, State*>& state_map) {
-  std::string temp, start_state, tape_symbol, pop, finish_state, push;
-  std::vector<std::string> push_vector;
+  std::string temp, start_state, finish_state;
+  char tape_symbol, pop, push;
+  std::vector<char> push_vector;
   while (std::getline(file, temp)) {
     std::istringstream iss(temp);
     iss >> start_state;
     iss >> tape_symbol;
     iss >> pop;
     iss >> finish_state;
+    push_vector.clear();
     while (iss >> push) {
       push_vector.push_back(push);
     }
     state_map[start_state]->addTransition(std::make_pair(tape_symbol, pop), std::make_pair(state_map[finish_state], push_vector));
   }
+}
+
+bool PushdownAutomaton::exec(std::string string) {
+  accepted_string_ = false;
+  return recursiveExec(string[0], string.substr(1, string.size() - 1), initial_state_, 0, '0');
+}
+
+bool PushdownAutomaton::recursiveExec(char tape_symbol, std::string string, State* current, int lastPushSize, char lastPop) {
+  std::cout << string << '\t';
+  std::cout << current->id_ << '\t'; 
+  stack_->operator<<(std::cout);
+  std::cout << '\n';
+  char poppingSymbol = stack_->top();
+  int aux;
+  std::set<std::pair<State*,std::vector<char>>> symbol_transitions = current->transition_function_[std::make_pair(tape_symbol, poppingSymbol)];
+  std::set<std::pair<State*,std::vector<char>>> epsilon_transitions = current->transition_function_[std::make_pair('.', poppingSymbol)];
+  std::set<std::pair<State*,std::vector<char>>>::iterator it = symbol_transitions.begin();
+  while (it != symbol_transitions.end()) {
+    std::cout << "Entré con el " << poppingSymbol << '\n';
+    stack_->pop();
+    std::vector<char> pushingSymbols = it->second;
+    for (int i = (int)pushingSymbols.size() - 1; i >= 0 ; i--) {
+      if (pushingSymbols[i] == '.') continue;
+      stack_->push(pushingSymbols[i]);
+    }
+    aux = pushingSymbols.size();
+    if (string != "")
+      accepted_string_ = recursiveExec(string[0], string.substr(1, string.size() - 1), it->first, pushingSymbols.size(), poppingSymbol);
+    if (stack_->empty()) return true;
+    it++;
+  }
+  for (int i = 0; i < aux; i++) {
+    stack_->pop();
+  }
+  stack_->push(poppingSymbol);
+  it = epsilon_transitions.begin();
+  while (it != epsilon_transitions.end()) {
+    std::cout << "Entré con el " << poppingSymbol << " en el .\n";
+    stack_->pop();
+    std::vector<char> pushingSymbols = it->second;
+    for (int i = (int)pushingSymbols.size() - 1; i >= 0 ; i--) {
+      if (pushingSymbols[i] == '.') continue;
+      stack_->push(pushingSymbols[i]);
+    }
+    if (string != "")
+      accepted_string_ = recursiveExec(tape_symbol, string, it->first, pushingSymbols.size(), poppingSymbol);
+    if (stack_->empty()) return true;
+    it++;
+  }
+  for (int i = 0; i < lastPushSize; i++) {
+    stack_->pop();
+  }
+  stack_->push(lastPop);
+  return accepted_string_;
 }

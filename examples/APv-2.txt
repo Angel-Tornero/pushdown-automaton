@@ -1,7 +1,7 @@
 # Automata por vaciado de pila 
 # epsilon esta representado por un .
 # Reconoce el lenguaje L = {ww^R}, donde w^R es la cadena obtenida al invertir el orden de w.
-#	Palabras palindomas de tamaño par
+#	Palabras palindomas de tamaï¿½o par
 p q
 0 1
 0 1 S
