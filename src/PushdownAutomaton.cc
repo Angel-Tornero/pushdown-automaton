@@ -123,50 +123,5 @@ bool PushdownAutomaton::exec(std::string string) {
 }
 
 bool PushdownAutomaton::recursiveExec(char tape_symbol, std::string string, State* current, int lastPushSize, char lastPop) {
-  std::cout << string << '\t';
-  std::cout << current->id_ << '\t'; 
-  stack_->operator<<(std::cout);
-  std::cout << '\n';
-  char poppingSymbol = stack_->top();
-  int aux;
-  std::set<std::pair<State*,std::vector<char>>> symbol_transitions = current->transition_function_[std::make_pair(tape_symbol, poppingSymbol)];
-  std::set<std::pair<State*,std::vector<char>>> epsilon_transitions = current->transition_function_[std::make_pair('.', poppingSymbol)];
-  std::set<std::pair<State*,std::vector<char>>>::iterator it = symbol_transitions.begin();
-  while (it != symbol_transitions.end()) {
-    std::cout << "Entré con el " << poppingSymbol << '\n';
-    stack_->pop();
-    std::vector<char> pushingSymbols = it->second;
-    for (int i = (int)pushingSymbols.size() - 1; i >= 0 ; i--) {
-      if (pushingSymbols[i] == '.') continue;
-      stack_->push(pushingSymbols[i]);
-    }
-    aux = pushingSymbols.size();
-    if (string != "")
-      accepted_string_ = recursiveExec(string[0], string.substr(1, string.size() - 1), it->first, pushingSymbols.size(), poppingSymbol);
-    if (stack_->empty()) return true;
-    it++;
-  }
-  for (int i = 0; i < aux; i++) {
-    stack_->pop();
-  }
-  stack_->push(poppingSymbol);
-  it = epsilon_transitions.begin();
-  while (it != epsilon_transitions.end()) {
-    std::cout << "Entré con el " << poppingSymbol << " en el .\n";
-    stack_->pop();
-    std::vector<char> pushingSymbols = it->second;
-    for (int i = (int)pushingSymbols.size() - 1; i >= 0 ; i--) {
-      if (pushingSymbols[i] == '.') continue;
-      stack_->push(pushingSymbols[i]);
-    }
-    if (string != "")
-      accepted_string_ = recursiveExec(tape_symbol, string, it->first, pushingSymbols.size(), poppingSymbol);
-    if (stack_->empty()) return true;
-    it++;
-  }
-  for (int i = 0; i < lastPushSize; i++) {
-    stack_->pop();
-  }
-  stack_->push(lastPop);
-  return accepted_string_;
+
 }
