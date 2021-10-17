@@ -119,9 +119,64 @@ void PushdownAutomaton::parseTransitionFunction(std::ifstream& file, std::map<st
 
 bool PushdownAutomaton::exec(std::string string) {
   accepted_string_ = false;
-  return recursiveExec(string[0], string.substr(1, string.size() - 1), initial_state_, 0, '0');
+  stack_->push(stack_->top());
+  return recursiveExec(string, initial_state_, {});
 }
 
-bool PushdownAutomaton::recursiveExec(char tape_symbol, std::string string, State* current, int lastPushSize, char lastPop) {
+int counter = 0;
 
+bool PushdownAutomaton::recursiveExec(std::string string, State* current, std::vector<char> pushing_array) {
+  counter++;
+  int aux = counter;
+  if (aux == 3) {
+    std::cout << aux << ' ';
+    std::cout << "entra asi\n";
+    stack_->operator<<(std::cout);
+    std::cout << '\n';
+  }
+  const char stack_top = stack_->top();
+  if (aux == 3) std::cout << stack_top << '\n';
+  stack_->pop();
+  for (int i = (int)pushing_array.size() - 1; i >= 0; i--) {
+    if (pushing_array[i] == '.') continue;
+    stack_->push(pushing_array[i]);
+  }
+  if (aux == 3) stack_->operator<<(std::cout);
+  if (aux == 3) std::cout << '\n';
+  //std::cout << current->id_ << '\t' << string << '\t';
+  //stack_->operator<<(std::cout);
+  
+  std::set<std::pair<State*, std::vector<char>>> symbol_transitions = current->transitionFunction(string[0], stack_->top());
+  std::set<std::pair<State*, std::vector<char>>> epsilon_transitions = current->transitionFunction('.', stack_->top());
+  for (auto transition: symbol_transitions) {
+    accepted_string_ = recursiveExec(string.substr(1, string.size() - 1), transition.first, transition.second);
+    if (accepted_string_) return true;
+  }
+
+  for (auto transition: epsilon_transitions) {
+    accepted_string_ = recursiveExec(string, transition.first, transition.second);
+    if (accepted_string_) return true;
+  }
+  if (string == "" && stack_->empty()) return true;
+  if (aux == 3) {
+    stack_->operator<<(std::cout);
+    std::cout << '\n';
+  }
+  for (int i = 0; i < (int)pushing_array.size(); i++) {
+    stack_->pop();
+  }
+  if (aux == 3) {
+    stack_->operator<<(std::cout);
+    std::cout << aux << ' ';
+  }
+  
+  stack_->push(stack_top);
+  if (aux == 3) {
+    std::cout << "\nsale asi";
+    stack_->operator<<(std::cout);
+    std::cout << '\n';
+  }
+  
+  
+  return accepted_string_;
 }

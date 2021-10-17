@@ -17,7 +17,7 @@ class State {
     std::string id_;
     std::map<std::pair<char, char>, std::set<std::pair<State*,std::vector<char>>>> transition_function_;
     
-    std::set<std::pair<State*,std::vector<char>>> getNext(char tape_symbol, char stack_symbol);
+    std::set<std::pair<State*, std::vector<char>>> transitionFunction(char tape_symbol, char stack_symbol);
   
   public:
     State(std::string id);

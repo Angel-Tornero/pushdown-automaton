@@ -20,7 +20,7 @@ class PushdownAutomaton {
 
     void parseAlphabet(std::ifstream& file, int option);
     void parseTransitionFunction(std::ifstream& file, std::map<std::string, State*>& state_map);
-    bool recursiveExec(char tape_symbol, std::string string, State* current, int lastPushSize, char lastPop);
+    bool recursiveExec(std::string string, State* current, std::vector<char> pushing_array);
 
   public:
     PushdownAutomaton(std::string& file_name);
