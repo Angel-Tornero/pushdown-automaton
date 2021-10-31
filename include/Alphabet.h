@@ -1,3 +1,15 @@
+/**
+ * @file Alphabet.h
+ * @author Ángel Tornero Hernández
+ * @brief Universidad de La Laguna
+ * @brief Escuela Superior de Ingeniería y Tecnología
+ * @brief Grado en Ingeniería Informática
+ * @brief Complejidad Computacional
+ * @version 1.0
+ * @date 2021-10-21
+ * 
+ */
+
 #include <string>
 #include <set>
 
@@ -19,6 +31,11 @@ class Alphabet {
      * 
      */
     bool contain(char c);
-
-    std::ostream& operator<<(std::ostream&);
+    /**
+     * @brief Operator <<
+     * @param os
+     * 
+     * @return std::ostream&
+     */
+    std::ostream& operator<<(std::ostream& os);
 };

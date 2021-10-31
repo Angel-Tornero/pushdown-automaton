@@ -1,3 +1,16 @@
+/**
+ * @file Stack.h
+ * @author Ángel Tornero Hernández
+ * @brief Universidad de La Laguna
+ * @brief Escuela Superior de Ingeniería y Tecnología
+ * @brief Grado en Ingeniería Informática
+ * @brief Complejidad Computacional
+ * @version 1.0
+ * @date 2021-10-21
+ * 
+ */
+
+
 #include <string>
 #include <vector>
 
@@ -7,7 +20,10 @@
  */
 class Stack {
   private:
+    friend class PushdownAutomaton;
+
     std::vector<char> stack_;
+    char initial_symbol_;
 
   public:
     Stack(char initial_symbol);
@@ -35,6 +51,10 @@ class Stack {
      * @return false 
      */
     bool empty();
-
-    std::ostream& operator<<(std::ostream& os);
+    /**
+     * @brief Return the stack formatted in a tring
+     * 
+     * @return string
+     */
+    std::string to_string();
 };
